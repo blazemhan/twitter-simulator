@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Twitter Post Simulator</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background: #15202B; /* Twitter dark theme */
+      color: #FFFFFF;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+    .container {
+      max-width: 600px;
+      width: 100%;
+    }
+    .tweet-preview {
+      background: #192734; /* Slightly lighter than background */
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid #38444D;
+    }
+    .profile {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .profile img {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      margin-right: 12px;
+    }
+    .profile-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .profile-info strong {
+      font-size: 15px;
+      font-weight: bold;
+    }
+    .profile-info span {
+      font-size: 15px;
+      color: #8899A6; /* Light gray for username */
+    }
+    .tweet-content {
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+    .tweet-time {
+      font-size: 13px;
+      color: #8899A6; /* Light gray for timestamp */
+    }
+    .tweet-stats {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+      color: #8899A6;
+      margin-top: 12px;
+    }
+    #verifiedTick {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 4px;
+    }
+    #verifiedTick svg {
+      width: 16px;
+      height: 16px;
+      vertical-align: middle;
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #38444D;
+      border-radius: 8px;
+      background: #192734;
+      color: #FFFFFF;
+      font-size: 14px;
+    }
+    button {
+      background: #1DA1F2; /* Twitter blue */
+      color: #FFFFFF;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1991DB; /* Slightly darker blue on hover */
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 style="text-align: center; color: #1DA1F2;">Twitter Post Simulator</h1>
+    <form id="tweetForm">
+      <input type="text" id="accountName" placeholder="Account Name" required>
+      <input type="text" id="username" placeholder="Username" required>
+      <textarea id="tweetContent" placeholder="What's happening?" required></textarea>
+      <input type="datetime-local" id="tweetTime" required>
+      <input type="file" id="profilePicture" accept="image/*" onchange="previewProfilePicture(event)">
+      <input type="number" id="reposts" placeholder="Number of Reposts" min="0">
+      <input type="number" id="quotes" placeholder="Number of Quotes" min="0">
+      <input type="number" id="likes" placeholder="Number of Likes" min="0">
+      <label>
+        <input type="checkbox" id="verified"> Verified Account
+      </label>
+      <button type="button" onclick="generateTweet()">Generate Tweet</button>
+      <button type="button" onclick="downloadTweetImage()">Download Tweet Image</button>
+    </form>
+
+    <div class="tweet-preview" id="tweetPreview">
+      <div class="profile">
+        <img id="profilePicturePreview" src="https://via.placeholder.com/48" alt="Profile Picture">
+        <div class="profile-info">
+          <div style="display: flex; align-items: center;">
+            <strong id="previewAccountName">Account Name</strong>
+            <span id="verifiedTick" style="display: none;">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="#1DA1F2">
+                <path d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484zm-6.616-3.334l-4.334 6.5c-.145.217-.382.334-.625.334-.143 0-.288-.04-.416-.126l-.115-.094-2.415-2.415c-.293-.293-.293-.768 0-1.06s.768-.294 1.06 0l1.77 1.767 3.825-5.74c.23-.345.696-.436 1.04-.207.346.23.44.696.21 1.04z"/>
+              </svg>
+            </span>
+          </div>
+          <span id="previewUsername">@username</span>
+        </div>
+      </div>
+      <div class="tweet-content" id="previewTweetContent">This is a sample tweet.</div>
+      <div class="tweet-time" id="previewTweetTime">10:00 AM · Jan 1, 2023</div>
+      <div class="tweet-stats">
+        <span id="previewReposts">0 Reposts</span>
+        <span id="previewQuotes">0 Quotes</span>
+        <span id="previewLikes">0 Likes</span>
+      </div>
+    </div>
+
+    <!-- Signature -->
+    <footer style="text-align: center; margin-top: 20px; color: #8899A6; font-size: 14px;">
+      Created by <a href="https://twitter.com/blazemhan" target="_blank" style="color: #1DA1F2; text-decoration: none;">blazemhan</a>
+    </footer>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    function generateTweet() {
+      const accountName = document.getElementById('accountName').value;
+      const username = document.getElementById('username').value;
+      const tweetContent = document.getElementById('tweetContent').value;
+      const tweetTime = new Date(document.getElementById('tweetTime').value).toLocaleString('en-US', {
+        hour: 'numeric',
+        minute: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+      const reposts = document.getElementById('reposts').value || 0;
+      const quotes = document.getElementById('quotes').value || 0;
+      const likes = document.getElementById('likes').value || 0;
+      const isVerified = document.getElementById('verified').checked;
+
+      document.getElementById('previewAccountName').innerText = accountName;
+      document.getElementById('previewUsername').innerText = `@${username}`;
+      document.getElementById('previewTweetContent').innerText = tweetContent;
+      document.getElementById('previewTweetTime').innerText = tweetTime;
+      document.getElementById('previewReposts').innerText = `${reposts} Reposts`;
+      document.getElementById('previewQuotes').innerText = `${quotes} Quotes`;
+      document.getElementById('previewLikes').innerText = `${likes} Likes`;
+      document.getElementById('verifiedTick').style.display = isVerified ? 'inline-flex' : 'none';
+    }
+
+    function previewProfilePicture(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          document.getElementById('profilePicturePreview').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function downloadTweetImage() {
+      html2canvas(document.getElementById('tweetPreview')).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'tweet.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+  </script>
+</body>
+</html>
